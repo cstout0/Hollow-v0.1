@@ -1,0 +1,10 @@
+graphics_preset MINIMAL
+sky_cycle 0
+fog_auto 1
+fog_mult 1.0000011
+radius 3
+max_chunks 100
+master_volume 0.8
+music_volume 0.8
+fov 70
+dynamic_lighting 1

@@ -1,0 +1,19 @@
+.gradle/
+build/
+out/
+bin/
+.idea/
+*.iml
+*.log
+models/
+.vscode/
+
+# Runtime save data â€” these change every play session and should never be tracked
+worlds.txt
+worlds/
+options.properties
+terrain_atlas.png
+
+/audio/
+sounds/
+build/dist/

@@ -1,0 +1,64 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.gradleup.shadow' version '8.3.6'
+}
+
+repositories { mavenCentral() }
+
+def lwjglVersion = '3.3.3'
+def jomlVersion = '1.10.5'
+
+def osName = System.getProperty('os.name').toLowerCase()
+def arch = System.getProperty('os.arch').toLowerCase()
+
+def lwjglNatives
+if (osName.contains('win')) lwjglNatives = 'natives-windows'
+else if (osName.contains('mac')) lwjglNatives = (arch.contains('aarch64') || arch.contains('arm')) ? 'natives-macos-arm64' : 'natives-macos'
+else lwjglNatives = (arch.contains('aarch64') || arch.contains('arm')) ? 'natives-linux-arm64' : 'natives-linux'
+
+application {
+    mainClass = 'noctfield.Main'
+    applicationName = 'Hollow'
+}
+
+run {
+    workingDir = projectDir   // explicit: ensure CWD is always the project root
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+// Force UTF-8 source encoding so all Unicode chars in string literals compile correctly on Windows
+compileJava.options.encoding = 'UTF-8'
+
+// Shadow (fat-jar) configuration for jpackage distribution
+shadowJar {
+    archiveBaseName   = 'hollow'
+    archiveClassifier = ''
+    archiveVersion    = ''
+    manifest { attributes 'Main-Class': 'noctfield.Main' }
+    // Merge duplicate module-info from LWJGL jars without crashing
+    exclude 'module-info.class'
+    mergeServiceFiles()
+}
+
+dependencies {
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+    implementation 'org.lwjgl:lwjgl'
+    implementation 'org.lwjgl:lwjgl-glfw'
+    implementation 'org.lwjgl:lwjgl-opengl'
+    implementation 'org.lwjgl:lwjgl-openal'
+    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
+    implementation 'org.lwjgl:lwjgl-stb'
+    runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+    implementation 'org.lwjgl:lwjgl-assimp'
+    runtimeOnly "org.lwjgl:lwjgl-assimp::$lwjglNatives"
+    implementation "org.joml:joml:$jomlVersion"
+}
